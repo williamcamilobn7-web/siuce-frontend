@@ -1,0 +1,103 @@
+
+<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:#1a237e;color:white;border-radius:8px;margin-bottom:20px;">
+  <div>
+    <span style="font-weight:bold;font-size:18px;">⚖ SIUCE Bridge</span>
+    <span style="margin-left:12px;font-size:13px;opacity:0.8;">Sistema de Gestión Disciplinaria</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px;">
+    <span style="font-size:14px;">Hola, {{ nombreCompleto }}</span>
+    <button (click)="logout()" 
+            style="background:#c62828;color:white;border:none;padding:6px 16px;border-radius:4px;cursor:pointer;font-size:14px;">
+      Cerrar sesión
+    </button>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+@if (rol === 'ESTUDIANTE') {
+  <div class="card mb-16">
+    <div class="card-header"><span class="card-title">Mis reportes disciplinarios</span></div>
+    @if (misReportes.length === 0) {
+      <div class="empty-state">No apareces en ningún reporte</div>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Reporte</th><th>Rol</th><th>Tipo</th><th>Estado</th><th>Fecha</th></tr></thead>
+          <tbody>
+            @for (r of misReportes; track r.reporteId) {
+              <tr>
+                <td>#{{r.reporteId}}</td>
+                <td><span class="badge" [class]="r.rol==='VICTIMA'?'badge-victima':r.rol==='AGRESOR'?'badge-agresor':'badge-testigo'">{{r.rol}}</span></td>
+                <td><span class="badge" [class]="r.tipoFalta==='TIPO_I'?'badge-t1':r.tipoFalta==='TIPO_II'?'badge-t2':'badge-t3'">{{tipoLabel(r.tipoFalta)}}</span></td>
+                <td><span class="badge" [class]="r.estado==='FIRMADO'?'badge-signed':'badge-pending'">{{r.estado}}</span></td>
+                <td>{{fmtFecha(r.fecha)}}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+}
+
+@if (rol === 'ACUDIENTE') {
+  <div class="card mb-16">
+    <div class="card-header"><span class="card-title">Reportes de mis acudidos</span></div>
+    @if (reportesAcudidos.length === 0) {
+      <div class="empty-state">Ningún acudido aparece en reportes</div>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Estudiante</th><th>Reporte</th><th>Rol</th><th>Tipo</th><th>Estado</th></tr></thead>
+          <tbody>
+            @for (r of reportesAcudidos; track r.reporteId) {
+              <tr>
+                <td>{{r.estudiante}}</td>
+                <td>#{{r.reporteId}}</td>
+                <td><span class="badge" [class]="r.rol==='VICTIMA'?'badge-victima':r.rol==='AGRESOR'?'badge-agresor':'badge-testigo'">{{r.rol}}</span></td>
+                <td><span class="badge" [class]="r.tipoFalta==='TIPO_I'?'badge-t1':r.tipoFalta==='TIPO_II'?'badge-t2':'badge-t3'">{{tipoLabel(r.tipoFalta)}}</span></td>
+                <td><span class="badge" [class]="r.estado==='FIRMADO'?'badge-signed':'badge-pending'">{{r.estado}}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+}
+
+@if (rol === 'DISCIPLINA' || rol === 'DOCENTE') {
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-label">Total Reportes</div><div class="stat-value">{{stats?.totalReportes ?? '—'}}</div></div>
+    <div class="stat-card t1"><div class="stat-label">Tipo I · Leve</div><div class="stat-value">{{stats?.porTipo?.['TIPO_I'] ?? '—'}}</div></div>
+    <div class="stat-card t2"><div class="stat-label">Tipo II · Moderado</div><div class="stat-value">{{stats?.porTipo?.['TIPO_II'] ?? '—'}}</div></div>
+    <div class="stat-card t3"><div class="stat-label">Tipo III · Grave</div><div class="stat-value">{{stats?.porTipo?.['TIPO_III'] ?? '—'}}</div></div>
+  </div>
+  <div class="card mb-16">
+    <div class="card-header"><span class="card-title">Reportes por tipo</span></div>
+    <div class="chart-wrap"><canvas id="chartTipo"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Reportes recientes</span>
+      <a routerLink="/reportes" class="btn btn-ghost btn-sm">Ver todos →</a>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Fecha</th><th>Lugar</th><th>Tipo</th><th>Estado</th><th></th></tr></thead>
+        <tbody>
+          @for (r of recientes; track r.id) {
+            <tr>
+              <td><code style="color:#2f80ed">#{{r.id}}</code></td>
+              <td>{{fmtFecha(r.fechaHora)}}</td>
+              <td>{{r.lugar}}</td>
+              <td><span class="badge" [class]="r.tipoFalta==='TIPO_I'?'badge-t1':r.tipoFalta==='TIPO_II'?'badge-t2':'badge-t3'">{{tipoLabel(r.tipoFalta)}}</span></td>
+              <td><span class="badge" [class]="r.estado==='FIRMADO'?'badge-signed':'badge-pending'">{{r.estado}}</span></td>
+              <td><a [routerLink]="['/reportes', r.id]" class="btn btn-ghost btn-sm">Ver →</a></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}

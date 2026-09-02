@@ -1,0 +1,52 @@
+<div style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+  <div>
+    <div style="font-family:'Lora',serif;font-size:20px;font-weight:600">Mapa de incidentes</div>
+    <div style="font-size:12px;color:#5a7494;margin-top:2px">Cartagena · Sistema Disciplinario SIUCE</div>
+  </div>
+  <div style="display:flex;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#8fa4be">
+      <span style="width:12px;height:12px;background:#22c55e;border-radius:50%;display:inline-block"></span> Tipo I ({{contarPorTipo('TIPO_I')}})
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#8fa4be">
+      <span style="width:12px;height:12px;background:#f59e0b;border-radius:50%;display:inline-block"></span> Tipo II ({{contarPorTipo('TIPO_II')}})
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#8fa4be">
+      <span style="width:12px;height:12px;background:#ef4444;border-radius:50%;display:inline-block"></span> Tipo III ({{contarPorTipo('TIPO_III')}})
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#8fa4be">
+      <span style="width:12px;height:12px;background:#60a5fa;border-radius:3px;display:inline-block"></span> EPS
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#8fa4be">
+      <span style="width:12px;height:12px;background:#a78bfa;border-radius:3px;display:inline-block"></span> Policía
+    </div>
+  </div>
+</div>
+
+@if (loading) {
+  <div class="empty-state"><div class="loader"></div></div>
+} @else {
+  <div class="card" style="padding:0;overflow:hidden">
+    <div id="mapa-container" style="height:520px;width:100%"></div>
+  </div>
+  <div class="card mt-16">
+    <div class="card-header"><span class="card-title">Resumen</span></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;text-align:center">
+      <div>
+        <div style="font-size:28px;font-weight:600;font-family:'Lora',serif">{{reportes.length}}</div>
+        <div style="font-size:11px;color:#5a7494;text-transform:uppercase;letter-spacing:1px">Total reportes</div>
+      </div>
+      <div>
+        <div style="font-size:28px;font-weight:600;font-family:'Lora',serif;color:#22c55e">{{contarPorTipo('TIPO_I')}}</div>
+        <div style="font-size:11px;color:#5a7494;text-transform:uppercase;letter-spacing:1px">Tipo I</div>
+      </div>
+      <div>
+        <div style="font-size:28px;font-weight:600;font-family:'Lora',serif;color:#f59e0b">{{contarPorTipo('TIPO_II')}}</div>
+        <div style="font-size:11px;color:#5a7494;text-transform:uppercase;letter-spacing:1px">Tipo II</div>
+      </div>
+      <div>
+        <div style="font-size:28px;font-weight:600;font-family:'Lora',serif;color:#ef4444">{{contarPorTipo('TIPO_III')}}</div>
+        <div style="font-size:11px;color:#5a7494;text-transform:uppercase;letter-spacing:1px">Tipo III</div>
+      </div>
+    </div>
+  </div>
+}

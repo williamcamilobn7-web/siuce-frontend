@@ -1,0 +1,65 @@
+<div class="login-wrap">
+  <div class="login-card">
+
+    <div class="login-brand">
+      <div class="login-logo">⚖</div>
+      <div class="login-title">SIUCE</div>
+      <div class="login-sub">Sistema Disciplinario · Ley 1620 de 2013</div>
+    </div>
+
+    <div class="tipo-tabs">
+      <button class="tab-btn" [class.active]="tipo==='admin'" (click)="tipo='admin'">
+        Personal institucional
+      </button>
+      <button class="tab-btn" [class.active]="tipo==='estudiante'" (click)="tipo='estudiante'">
+        Estudiante
+      </button>
+    </div>
+
+    @if (tipo === 'admin') {
+      <div class="form-group">
+        <label class="form-label">Usuario</label>
+        <input class="form-control" [(ngModel)]="form.username"
+          placeholder="Ingresa tu usuario"
+          (keyup.enter)="login()"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input class="form-control" type="password" [(ngModel)]="form.password"
+          placeholder="••••••••"
+          (keyup.enter)="login()"/>
+      </div>
+      <button class="btn-login" (click)="login()" [disabled]="loading">
+        @if (loading) { <span class="loader-small"></span> Verificando... }
+        @else { Ingresar al sistema }
+      </button>
+    }
+
+    @if (tipo === 'estudiante') {
+      <div class="form-group">
+        <label class="form-label">Número de documento</label>
+        <input class="form-control" [(ngModel)]="formEst.numeroDocumento"
+          placeholder="Tu número de documento"
+          (keyup.enter)="loginEstudiante()"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input class="form-control" type="password" [(ngModel)]="formEst.password"
+          placeholder="••••••••"
+          (keyup.enter)="loginEstudiante()"/>
+      </div>
+      <div class="login-hint">
+         La contraseña por defecto es tu número de documento
+      </div>
+      <button class="btn-login" (click)="loginEstudiante()" [disabled]="loading">
+        @if (loading) { <span class="loader-small"></span> Verificando... }
+        @else { Ingresar }
+      </button>
+    }
+
+    <div class="login-footer">
+      Institución Educativa San José · Cartagena, Colombia
+    </div>
+
+  </div>
+</div>

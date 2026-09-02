@@ -1,0 +1,79 @@
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">Reportes disciplinarios</span>
+    <div style="display:flex;gap:10px;align-items:center">
+      <select class="form-control" style="width:130px;padding:7px 10px" [(ngModel)]="filtroTipo" (change)="aplicarFiltros()">
+        <option value="">Todos los tipos</option>
+        <option value="TIPO_I">Tipo I</option>
+        <option value="TIPO_II">Tipo II</option>
+        <option value="TIPO_III">Tipo III</option>
+      </select>
+      <select class="form-control" style="width:130px;padding:7px 10px" [(ngModel)]="filtroEstado" (change)="aplicarFiltros()">
+        <option value="">Todos los estados</option>
+        <option value="PENDIENTE">Pendiente</option>
+        <option value="FIRMADO">Firmado</option>
+      </select>
+      <button class="btn btn-primary" (click)="abrirCrear()">＋ Nuevo</button>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="empty-state"><div class="loader"></div></div>
+  } @else if (filtrados.length === 0) {
+    <div class="empty-state">No hay reportes que mostrar</div>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Fecha</th><th>Lugar</th><th>Tipo</th><th>Estado</th><th>Firmado por</th><th>Acciones</th></tr></thead>
+        <tbody>
+          @for (r of filtrados; track r.id) {
+            <tr>
+              <td><code style="color:#2f80ed">#{{r.id}}</code></td>
+              <td style="font-size:12px">{{fmtFecha(r.fechaHora)}}</td>
+              <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{r.lugar}}</td>
+              <td><span class="badge" [class]="r.tipoFalta==='TIPO_I'?'badge-t1':r.tipoFalta==='TIPO_II'?'badge-t2':'badge-t3'">{{tipoLabel(r.tipoFalta)}}</span></td>
+              <td><span class="badge" [class]="r.estado==='FIRMADO'?'badge-signed':'badge-pending'">{{r.estado}}</span></td>
+              <td style="font-size:12px;color:#5a7494">{{r.firmadoPor||'—'}}</td>
+              <td>
+                <div class="actions-cell">
+                  <a [routerLink]="['/reportes',r.id]" class="btn btn-ghost btn-sm">Ver</a>
+                  @if (r.estado==='PENDIENTE') { <button class="btn btn-ghost btn-sm" (click)="abrirEditar(r)">Editar</button> }
+                  @if (r.estado==='PENDIENTE' && r.tipoFalta!=='TIPO_III') { <button class="btn btn-danger btn-sm" (click)="eliminar(r)">Eliminar</button> }
+                  @if (r.tipoFalta==='TIPO_III' && r.estado==='PENDIENTE') { <button class="btn btn-success btn-sm" (click)="firmar(r)">✓ Firmar</button> }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+<div class="modal-backdrop" [class.open]="modalOpen">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">{{editando ? 'Editar reporte #'+editando.id : 'Nuevo reporte'}}</span>
+      <button class="btn-close" (click)="modalOpen=false">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Lugar del incidente *</label>
+        <input class="form-control" [(ngModel)]="form.lugar" placeholder="Ej: Patio de recreo"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción del hecho *</label>
+        <textarea class="form-control" [(ngModel)]="form.descripcionHecho" rows="5" (input)="calcTipo()" placeholder="Describe lo ocurrido…"></textarea>
+        @if (tipoPreview) {
+          <span class="badge mt-16" [class]="tipoPreview==='TIPO_I'?'badge-t1':tipoPreview==='TIPO_II'?'badge-t2':'badge-t3'">
+            {{tipoLabel(tipoPreview)}} (estimado)
+          </span>
+        }
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" (click)="modalOpen=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardar()">Guardar</button>
+    </div>
+  </div>
+</div>

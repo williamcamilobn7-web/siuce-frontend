@@ -1,0 +1,39 @@
+<div class="grid-2">
+  <div class="card">
+    <div class="card-header"><span class="card-title">Acudientes ({{lista.length}})</span></div>
+    @for (a of lista; track a.id) {
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border:1px solid var(--navy-border);border-radius:6px;margin-bottom:8px;background:rgba(255,255,255,.02)">
+        <div>
+          <div style="font-size:13px;font-weight:500">{{a.nombreCompleto}}</div>
+          <div style="font-size:11px;color:#5a7494;margin-top:1px">{{a.telefono}} · {{a.email||'—'}}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="width:8px;height:8px;border-radius:50%;display:inline-block" [style.background]="a.notificado?'#22c55e':'#5a7494'"></span>
+          @if (!a.notificado) {
+            <button class="btn btn-success btn-sm" (click)="notificar(a)">Notificar</button>
+          } @else {
+            <span style="font-size:11px;color:#22c55e">✓ Notificado</span>
+          }
+        </div>
+      </div>
+    }
+    @if (lista.length===0) { <div class="empty-state">Sin acudientes registrados</div> }
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">Agregar acudiente</span></div>
+    <div class="form-group">
+      <label class="form-label">Nombre completo *</label>
+      <input class="form-control" [(ngModel)]="form.nombreCompleto" placeholder="Nombre"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Teléfono</label>
+      <input class="form-control" [(ngModel)]="form.telefono" placeholder="300 000 0000"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Correo</label>
+      <input class="form-control" [(ngModel)]="form.email" placeholder="correo@ejemplo.com"/>
+    </div>
+    <button class="btn btn-primary" (click)="guardar()">Guardar</button>
+  </div>
+</div>

@@ -1,0 +1,129 @@
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">Estudiantes ({{lista.length}})</span>
+    <div style="display:flex;gap:10px;align-items:center">
+      <input class="form-control" style="width:220px;padding:7px 10px" [(ngModel)]="busqueda" (input)="filtrar()" placeholder="Buscar por nombre, doc o grado..."/>
+      <button class="btn btn-primary" (click)="abrirCrear()">＋ Nuevo</button>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="empty-state"><div class="loader"></div></div>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Documento</th><th>Nombre</th><th>Grado</th><th>Jornada</th><th>Promedio</th><th>Inasistencias</th><th>Acudiente</th><th>Acciones</th></tr></thead>
+        <tbody>
+          @for (e of filtrados; track e.id) {
+            <tr>
+              <td style="font-size:12px">{{e.tipoDocumento}} {{e.numeroDocumento}}</td>
+              <td>{{e.nombres}} {{e.apellidos}}</td>
+              <td>{{e.grado||'—'}}</td>
+              <td style="font-size:12px">{{e.jornada||'—'}}</td>
+              <td><span [style.color]="(e.promedioAcademico||0)<3?'#ef4444':(e.promedioAcademico||0)<4?'#f59e0b':'#22c55e'">{{e.promedioAcademico||'—'}}</span></td>
+              <td>{{e.numeroInasistencias||0}}</td>
+              <td style="font-size:12px;color:#5a7494">{{e.acudiente?.nombreCompleto||'—'}}</td>
+              <td>
+                <div class="actions-cell">
+                  <button class="btn btn-ghost btn-sm" (click)="abrirEditar(e)">Editar</button>
+                  <button class="btn btn-danger btn-sm" (click)="eliminar(e)">Eliminar</button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
+
+<div class="modal-backdrop" [class.open]="modalOpen">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <span class="modal-title">{{editando ? 'Editar estudiante' : 'Nuevo estudiante'}}</span>
+      <button class="btn-close" (click)="modalOpen=false">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Tipo documento</label>
+          <select class="form-control" [(ngModel)]="form.tipoDocumento">
+            <option value="RC">Registro Civil</option>
+            <option value="TI">Tarjeta de Identidad</option>
+            <option value="CC">Cédula de Ciudadanía</option>
+            <option value="PPT">PPT</option>
+            <option value="CE">Cédula Extranjería</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">N° documento *</label>
+          <input class="form-control" [(ngModel)]="form.numeroDocumento" placeholder="Número"/>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Nombres *</label>
+          <input class="form-control" [(ngModel)]="form.nombres" placeholder="Nombres"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Apellidos *</label>
+          <input class="form-control" [(ngModel)]="form.apellidos" placeholder="Apellidos"/>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Fecha de nacimiento</label>
+          <input class="form-control" type="date" [(ngModel)]="form.fechaNacimiento"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Género</label>
+          <select class="form-control" [(ngModel)]="form.genero">
+            <option value="">— Seleccionar —</option>
+            <option value="MASCULINO">Masculino</option>
+            <option value="FEMENINO">Femenino</option>
+            <option value="OTRO">Otro</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Grado</label>
+          <input class="form-control" [(ngModel)]="form.grado" placeholder="Ej: 9A"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Jornada</label>
+          <select class="form-control" [(ngModel)]="form.jornada">
+            <option value="">— Seleccionar —</option>
+            <option value="MANANA">Mañana</option>
+            <option value="TARDE">Tarde</option>
+            <option value="NOCHE">Noche</option>
+            <option value="UNICA">Única</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="form-label">Promedio académico</label>
+          <input class="form-control" type="number" min="0" max="5" step="0.1" [(ngModel)]="form.promedioAcademico" placeholder="0.0 - 5.0"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">N° inasistencias</label>
+          <input class="form-control" type="number" min="0" [(ngModel)]="form.numeroInasistencias" placeholder="0"/>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" (click)="modalOpen=false">Cancelar</button>
+      <button class="btn btn-primary" (click)="guardar()">Guardar</button>
+    </div>
+  </div>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;margin-top:8px">
+  <span style="font-size:12px;color:#5a7494">
+    {{totalElementos}} estudiantes · Página {{pagina+1}} de {{totalPaginas}}
+  </span>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-ghost btn-sm" (click)="paginaAnterior()" [disabled]="pagina===0">← Anterior</button>
+    <button class="btn btn-ghost btn-sm" (click)="paginaSiguiente()" [disabled]="pagina===totalPaginas-1">Siguiente →</button>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+.header {
+  height: 62px;
+  background: var(--navy-mid);
+  border-bottom: 1px solid var(--navy-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  .header-title { font-family: 'Lora', serif; font-size: 15px; font-weight: 500; color: var(--text-main); }
+  .header-sub   { font-size: 11px; color: var(--text-dim); margin-top: 1px; }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+}

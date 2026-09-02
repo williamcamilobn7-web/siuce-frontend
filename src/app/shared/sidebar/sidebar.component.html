@@ -1,0 +1,31 @@
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">⚖ SIUCE</div>
+    <div class="logo-sub">Sistema Disciplinario · Ley 1620</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Principal</div>
+    <a class="nav-item" routerLink="/dashboard" routerLinkActive="active">
+      <span class="nav-icon">▦</span> Dashboard
+    </a>
+    <a class="nav-item" routerLink="/reportes" routerLinkActive="active">
+      <span class="nav-icon">☰</span> Reportes
+    </a>
+    <a class="nav-item" routerLink="/mapa" routerLinkActive="active">
+      <span class="nav-icon">◉</span> Mapa
+    </a>
+    @if (esDisciplinaODocente()) {
+      <div class="nav-section-label">Gestión</div>
+      <a class="nav-item" routerLink="/estudiantes" routerLinkActive="active">
+        <span class="nav-icon">◉</span> Estudiantes
+      </a>
+      <a class="nav-item" routerLink="/acudientes" routerLinkActive="active">
+        <span class="nav-icon">◎</span> Acudientes
+      </a>
+    }
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-name">{{nombre}}</div>
+    <div class="user-rol">{{rol}}</div>
+  </div>
+</aside>

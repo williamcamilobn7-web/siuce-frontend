@@ -1,0 +1,5 @@
+<div class="toast-container">
+  @for (m of toast.msgs(); track m.id) {
+    <div class="toast" [class]="'toast-' + m.type">{{m.text}}</div>
+  }
+</div>
