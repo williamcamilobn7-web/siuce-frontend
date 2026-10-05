@@ -1,9 +1,8 @@
-// dashboard.component.ts
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { Router } from '@angular/router'; // ← NUEVO: importar Router
 import { ApiService } from '../../core/services/api.service';
+import { SesionService } from '../../core/services/sesion.service';
 import { Reporte, Estadisticas } from '../../core/models/models';
 
 @Component({
@@ -15,16 +14,17 @@ import { Reporte, Estadisticas } from '../../core/models/models';
 })
 export class DashboardComponent implements OnInit {
   private api = inject(ApiService);
-  private router = inject(Router); // 
+  private sesion = inject(SesionService);
   stats: Estadisticas | null = null;
   recientes: Reporte[] = [];
   rol = localStorage.getItem('rol') || '';
+  esPersonal = ['DISCIPLINA', 'DOCENTE', 'RECTOR'].includes(this.rol);
   nombreCompleto = localStorage.getItem('nombreCompleto') || 'Usuario';
   misReportes: any[] = JSON.parse(localStorage.getItem('misReportes') || '[]');
   reportesAcudidos: any[] = JSON.parse(localStorage.getItem('reportesAcudidos') || '[]');
 
   ngOnInit() {
-    if (['DISCIPLINA','DOCENTE'].includes(this.rol)) {
+    if (this.esPersonal) {
       this.api.get<Estadisticas>('/api/reportes/estadisticas').subscribe(s => {
         this.stats = s;
         setTimeout(() => this.initCharts(s), 100);
@@ -53,14 +53,11 @@ export class DashboardComponent implements OnInit {
   }
 
   tipoLabel(t: string) { return t==='TIPO_I'?'Tipo I':t==='TIPO_II'?'Tipo II':'Tipo III'; }
-  
+
   fmtFecha(iso: string) {
     if (!iso) return '—';
     return new Date(iso).toLocaleDateString('es-CO', {day:'2-digit', month:'short', year:'numeric'});
   }
 
-  logout() {
-    localStorage.clear();
-    this.router.navigate(['/login']);
-  }
+  logout() { this.sesion.logout(); }
 }

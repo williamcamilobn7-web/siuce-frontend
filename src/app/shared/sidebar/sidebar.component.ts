@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -13,7 +13,8 @@ export class SidebarComponent {
   rol = localStorage.getItem('rol') || '';
   nombre = localStorage.getItem('nombreCompleto') || '';
 
+  // Personal del colegio (incluye al rector)
   esDisciplinaODocente() {
-    return ['DISCIPLINA','DOCENTE'].includes(this.rol);
+    return ['DISCIPLINA', 'DOCENTE', 'RECTOR'].includes(this.rol);
   }
 }

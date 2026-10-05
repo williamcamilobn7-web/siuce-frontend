@@ -26,6 +26,12 @@ export class ReportesComponent implements OnInit {
   form = { lugar: '', descripcionHecho: '' };
   tipoPreview = '';
 
+    // Permisos según el rol (el backend también los valida; esto solo oculta botones)
+  rol = localStorage.getItem('rol') || '';
+  esDisciplina = this.rol === 'DISCIPLINA';
+  esRector = this.rol === 'RECTOR';
+  puedeCrear = ['DISCIPLINA', 'DOCENTE'].includes(this.rol);
+
   ngOnInit() { this.cargar(); }
 
   cargar() {

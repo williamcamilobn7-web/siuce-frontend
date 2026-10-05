@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { SesionService } from '../../core/services/sesion.service';
 
 @Component({
   selector: 'app-header',
@@ -10,10 +11,11 @@ import { Router } from '@angular/router';
 })
 export class HeaderComponent {
   private router = inject(Router);
+  private sesion = inject(SesionService);
 
-  logout() {
-    localStorage.clear();
-    this.router.navigate(['/login']);
-  }
+  // Solo DISCIPLINA y DOCENTE pueden crear reportes
+  puedeCrear = ['DISCIPLINA', 'DOCENTE'].includes(localStorage.getItem('rol') || '');
+
+  logout() { this.sesion.logout(); }
   nuevo() { this.router.navigate(['/reportes']); }
 }

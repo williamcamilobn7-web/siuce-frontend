@@ -31,13 +31,23 @@ export class DetalleComponent implements OnInit {
   estudiantesFiltrados: Estudiante[] = [];
   buscando = false;
 
- ngOnInit() {
-   const id = Number(this.route.snapshot.paramMap.get('id'));
-   this.api.get<Reporte>(`/api/reportes/${id}`).subscribe(r => { this.reporte = r; this.loading = false; });
-   this.api.get<Implicado[]>(`/api/reportes/${id}/implicados`).subscribe(i => this.implicados = i);
-   this.api.get<Acudiente[]>('/api/acudientes').subscribe(a => this.acudientes = a);
-   this.estudiantesFiltrados = [];
-}
+  // Permisos según el rol (el backend también los valida; esto solo oculta botones)
+  rol = localStorage.getItem('rol') || '';
+  esRector = this.rol === 'RECTOR';
+  esDisciplina = this.rol === 'DISCIPLINA';
+  puedeAgregarImp = ['DISCIPLINA', 'DOCENTE'].includes(this.rol);
+  puedeSiuce = ['DISCIPLINA', 'RECTOR'].includes(this.rol);
+
+  ngOnInit() {
+    // El id de Mongo es un texto, no un número: no se convierte con Number()
+    const id = this.route.snapshot.paramMap.get('id')!;
+    this.api.get<Reporte>(`/api/reportes/${id}`).subscribe(r => { this.reporte = r; this.loading = false; });
+    if (this.puedeSiuce || this.puedeAgregarImp) {
+      this.api.get<Implicado[]>(`/api/reportes/${id}/implicados`).subscribe(i => this.implicados = i);
+      this.api.get<Acudiente[]>('/api/acudientes').subscribe(a => this.acudientes = a);
+    }
+    this.estudiantesFiltrados = [];
+  }
 
   reload() {
     const id = this.reporte!.id;
@@ -77,21 +87,16 @@ export class DetalleComponent implements OnInit {
   fmtFecha(iso: string) { return iso ? new Date(iso).toLocaleString('es-CO') : '—'; }
   nombreEstudiante(e: Estudiante) { return `${e.nombres} ${e.apellidos} (${e.numeroDocumento})`; }
 
-
-
- 
-
-buscarEstudiantes() {
-  if (this.busquedaEstudiante.trim().length < 2) {
-    this.estudiantesFiltrados = [];
-    return;
+  buscarEstudiantes() {
+    if (this.busquedaEstudiante.trim().length < 2) {
+      this.estudiantesFiltrados = [];
+      return;
+    }
+    this.buscando = true;
+    this.api.get<Estudiante[]>(`/api/estudiantes/buscar?q=${encodeURIComponent(this.busquedaEstudiante)}`)
+      .subscribe({
+        next: r => { this.estudiantesFiltrados = r; this.buscando = false; },
+        error: () => this.buscando = false
+      });
   }
-  this.buscando = true;
-  this.api.get<Estudiante[]>(`/api/estudiantes/buscar?q=${this.busquedaEstudiante}`)
-    .subscribe({
-      next: r => { this.estudiantesFiltrados = r; this.buscando = false; },
-      error: () => this.buscando = false
-    });
 }
-}
-
