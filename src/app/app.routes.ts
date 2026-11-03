@@ -20,5 +20,6 @@ export const routes: Routes = [
   { path: 'reportes/:id',canActivate: [authGuard], loadComponent: () => import('./pages/detalle/detalle').then(m => m.DetalleComponent) },
   { path: 'estudiantes', canActivate: [authGuard], loadComponent: () => import('./pages/estudiantes/estudiantes').then(m => m.EstudiantesComponent) },
   { path: 'mapa', canActivate: [authGuard], loadComponent: () => import('./pages/mapa/mapa').then(m => m.MapaComponent) },
+  { path: 'oauth-callback', loadComponent: () => import('./pages/oauth-callback/oauth-callback').then(m => m.OauthCallbackComponent) },
   { path: 'acudientes',  canActivate: [authGuard], loadComponent: () => import('./pages/acudientes/acudientes').then(m => m.AcudientesComponent) },
 ];

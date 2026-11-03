@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../shared/toast/toast';
+import { environment } from '../../../environments/environment';
 
 
 @Component({
@@ -43,6 +44,9 @@ export class LoginComponent {
       next: res => this.guardarSesion(res),
       error: () => { this.toast.show('Documento o contraseña incorrectos', 'err'); this.loading = false; }
     });
+  }
+  loginGoogle() {
+    window.location.href = `${environment.apiUrl}/oauth2/authorization/google`;
   }
 
   guardarSesion(res: any) {
