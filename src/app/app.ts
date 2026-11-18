@@ -19,9 +19,9 @@ export class AppComponent implements OnInit {
   showLayout = false;
 
   ngOnInit() {
-    this.showLayout = !!localStorage.getItem('token');
+    this.showLayout = !!localStorage.getItem('rol');
     this.router.events.pipe(filter(e => e instanceof NavigationEnd)).subscribe(() => {
-      this.showLayout = !!localStorage.getItem('token');
+      this.showLayout = !!localStorage.getItem('rol');
     });
   }
 }

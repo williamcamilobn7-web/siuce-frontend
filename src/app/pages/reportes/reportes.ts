@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../shared/toast/toast';
-import { Reporte } from '../../core/models/models';
+import { Reporte, Estudiante } from '../../core/models/models';
 
 @Component({
   selector: 'app-reportes',
@@ -26,7 +26,17 @@ export class ReportesComponent implements OnInit {
   form = { lugar: '', descripcionHecho: '' };
   tipoPreview = '';
 
-    // Permisos según el rol (el backend también los valida; esto solo oculta botones)
+  // Implicados que se asignarán al crear el reporte
+  implicadosParaCrear: { estudiante: Estudiante; rol: 'VICTIMA' | 'AGRESOR' | 'TESTIGO' }[] = [];
+  busquedaEstudiante = '';
+  estudiantesFiltrados: Estudiante[] = [];
+  buscando = false;
+  nuevoImplicado: { estudianteId: string; rol: 'VICTIMA' | 'AGRESOR' | 'TESTIGO' } = {
+    estudianteId: '',
+    rol: 'VICTIMA'
+  };
+
+  // Permisos según el rol (el backend también los valida; esto solo oculta botones)
   rol = localStorage.getItem('rol') || '';
   esDisciplina = this.rol === 'DISCIPLINA';
   esRector = this.rol === 'RECTOR';
@@ -49,9 +59,23 @@ export class ReportesComponent implements OnInit {
     );
   }
 
-  abrirCrear() { this.editando = null; this.form = { lugar:'', descripcionHecho:'' }; this.tipoPreview=''; this.modalOpen=true; }
+  abrirCrear() {
+    this.editando = null;
+    this.form = { lugar: '', descripcionHecho: '' };
+    this.tipoPreview = '';
+    this.implicadosParaCrear = [];
+    this.busquedaEstudiante = '';
+    this.estudiantesFiltrados = [];
+    this.nuevoImplicado = { estudianteId: '', rol: 'VICTIMA' };
+    this.modalOpen = true;
+  }
 
-  abrirEditar(r: Reporte) { this.editando=r; this.form={lugar:r.lugar, descripcionHecho:r.descripcionHecho}; this.calcTipo(); this.modalOpen=true; }
+  abrirEditar(r: Reporte) {
+    this.editando = r;
+    this.form = { lugar: r.lugar, descripcionHecho: r.descripcionHecho };
+    this.calcTipo();
+    this.modalOpen = true;
+  }
 
   calcTipo() {
     const d = this.form.descripcionHecho.toLowerCase();
@@ -62,32 +86,88 @@ export class ReportesComponent implements OnInit {
     else this.tipoPreview = d.length > 5 ? 'TIPO_I' : '';
   }
 
-guardar() {
-  if (!this.form.lugar.trim() || !this.form.descripcionHecho.trim()) {
-    this.toast.show('Completa todos los campos', 'err'); return;
+  buscarEstudiantes() {
+    if (this.busquedaEstudiante.trim().length < 2) {
+      this.estudiantesFiltrados = [];
+      return;
+    }
+    this.buscando = true;
+    this.api.get<Estudiante[]>(`/api/estudiantes/buscar?q=${encodeURIComponent(this.busquedaEstudiante)}`)
+      .subscribe({
+        next: r => { this.estudiantesFiltrados = r; this.buscando = false; },
+        error: () => this.buscando = false
+      });
   }
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      pos => this.enviarReporte(pos.coords.latitude, pos.coords.longitude),
-      ()  => this.enviarReporte(null, null)
-    );
-  } else {
-    this.enviarReporte(null, null);
-  }
-}
 
-enviarReporte(latitud: number | null, longitud: number | null) {
-  const body: any = { ...this.form };
-  if (latitud) body.latitud = latitud;
-  if (longitud) body.longitud = longitud;
-  const obs = this.editando
-    ? this.api.put<any>(`/api/reportes/${this.editando.id}`, body)
-    : this.api.post<any>('/api/reportes', body);
-  obs.subscribe({
-    next: () => { this.toast.show(this.editando ? 'Actualizado' : 'Creado'); this.modalOpen = false; this.cargar(); },
-    error: () => {}
-  });
-}
+  nombreEstudiante(e: Estudiante) {
+    return `${e.nombres} ${e.apellidos} (${e.numeroDocumento})`;
+  }
+
+  agregarImplicadoTemporal() {
+    if (!this.nuevoImplicado.estudianteId) {
+      this.toast.show('Selecciona un estudiante', 'err');
+      return;
+    }
+    const yaExiste = this.implicadosParaCrear.some(i => String(i.estudiante.id) === String(this.nuevoImplicado.estudianteId));
+    if (yaExiste) {
+      this.toast.show('Ese estudiante ya está en la lista de implicados', 'err');
+      return;
+    }
+    const est = this.estudiantesFiltrados.find(e => String(e.id) === String(this.nuevoImplicado.estudianteId));
+    if (!est) return;
+
+    this.implicadosParaCrear.push({
+      estudiante: est,
+      rol: this.nuevoImplicado.rol
+    });
+
+    this.nuevoImplicado.estudianteId = '';
+    this.toast.show('Implicado añadido a la lista');
+  }
+
+  quitarImplicadoTemporal(index: number) {
+    this.implicadosParaCrear.splice(index, 1);
+  }
+
+  guardar() {
+    if (!this.form.lugar.trim() || !this.form.descripcionHecho.trim()) {
+      this.toast.show('Completa todos los campos obligatorios', 'err'); return;
+    }
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        pos => this.enviarReporte(pos.coords.latitude, pos.coords.longitude),
+        ()  => this.enviarReporte(null, null)
+      );
+    } else {
+      this.enviarReporte(null, null);
+    }
+  }
+
+  enviarReporte(latitud: number | null, longitud: number | null) {
+    const body: any = { ...this.form };
+    if (latitud) body.latitud = latitud;
+    if (longitud) body.longitud = longitud;
+
+    if (!this.editando && this.implicadosParaCrear.length > 0) {
+      body.implicados = this.implicadosParaCrear.map(i => ({
+        estudianteId: i.estudiante.id,
+        rol: i.rol,
+        acudienteId: i.estudiante.acudiente?.id
+      }));
+    }
+
+    const obs = this.editando
+      ? this.api.put<any>(`/api/reportes/${this.editando.id}`, body)
+      : this.api.post<any>('/api/reportes', body);
+    obs.subscribe({
+      next: () => {
+        this.toast.show(this.editando ? 'Actualizado' : 'Reporte creado con éxito');
+        this.modalOpen = false;
+        this.cargar();
+      },
+      error: () => {}
+    });
+  }
 
   eliminar(r: Reporte) {
     if (!confirm(`¿Eliminar reporte #${r.id}?`)) return;

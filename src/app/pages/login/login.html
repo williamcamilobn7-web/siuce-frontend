@@ -9,10 +9,13 @@
 
     <div class="tipo-tabs">
       <button class="tab-btn" [class.active]="tipo==='admin'" (click)="tipo='admin'">
-        Personal institucional
+        Personal
       </button>
       <button class="tab-btn" [class.active]="tipo==='estudiante'" (click)="tipo='estudiante'">
         Estudiante
+      </button>
+      <button class="tab-btn" [class.active]="tipo==='acudiente'" (click)="tipo='acudiente'">
+        Acudiente
       </button>
     </div>
 
@@ -57,11 +60,31 @@
       </button>
     }
 
+    @if (tipo === 'acudiente') {
+      <div style="text-align:center;padding:12px 6px 18px">
+        <div style="font-size:34px;margin-bottom:8px">👨‍👩‍👧‍👦</div>
+        <div style="font-weight:600;font-size:15px;color:var(--text-main);margin-bottom:6px">Portal de Acudientes</div>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.5;margin-bottom:20px">
+          Ingresa con tu cuenta de Google (Gmail) para consultar el seguimiento disciplinario de tus acudidos.
+        </div>
+        <button type="button" class="btn btn-primary" style="width:100%;justify-content:center;padding:11px 16px;font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:10px" (click)="loginGoogle()">
+          <svg style="width:18px;height:18px" viewBox="0 0 24 24">
+            <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/>
+            <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+            <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 12.3 0 15.1s.7 5.4 1.9 7.8l3.7-2.9z"/>
+            <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16c1.8 3.7 5.6 7 10.1 7z"/>
+          </svg>
+          Continuar con Google
+        </button>
+        <div class="login-hint" style="margin-top:14px">
+          * Debe ser el correo electrónico registrado como acudiente en la institución.
+        </div>
+      </div>
+    }
+
     <div class="login-footer">
       Institución Educativa San José · Cartagena, Colombia
     </div>
-    <div style="text-align:center;margin:16px 0 10px;font-size:12px;color:var(--text-dim)">— o entra con —</div>
-    <button type="button" class="btn btn-ghost" style="width:100%;justify-content:center" (click)="loginGoogle()">Continuar con Google</button>
 
   </div>
 </div>

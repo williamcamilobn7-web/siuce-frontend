@@ -50,12 +50,12 @@ export class LoginComponent {
   }
 
   guardarSesion(res: any) {
-    localStorage.setItem('token', res.token);
     localStorage.setItem('rol', res.rol);
     localStorage.setItem('nombreCompleto', res.nombreCompleto);
     localStorage.setItem('username', res.username);
     if (res.misReportes) localStorage.setItem('misReportes', JSON.stringify(res.misReportes));
     if (res.reportesAcudidos) localStorage.setItem('reportesAcudidos', JSON.stringify(res.reportesAcudidos));
+    this.loading = false;
     this.toast.show('Bienvenido, ' + res.nombreCompleto);
     this.router.navigate(['/dashboard']);
   }

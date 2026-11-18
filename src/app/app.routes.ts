@@ -2,10 +2,9 @@ import { Routes } from '@angular/router';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 
-// AuthGuard como función
 const authGuard = () => {
   const router = inject(Router);
-  if (localStorage.getItem('token')) return true;
+  if (localStorage.getItem('rol')) return true;
   router.navigate(['/login']);
   return false;
 };
@@ -13,7 +12,7 @@ const authGuard = () => {
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.LoginComponent) },
-  
+
   // Todas las rutas protegidas con authGuard
   { path: 'dashboard',   canActivate: [authGuard], loadComponent: () => import('./pages/dashboard/dashboard').then(m => m.DashboardComponent) },
   { path: 'reportes',    canActivate: [authGuard], loadComponent: () => import('./pages/reportes/reportes').then(m => m.ReportesComponent) },

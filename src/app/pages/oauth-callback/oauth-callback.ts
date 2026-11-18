@@ -4,8 +4,8 @@ import { ApiService } from '../../core/services/api.service';
 import { ToastService } from '../../shared/toast/toast';
 
 /**
- * Pantalla a la que vuelve el navegador después de entrar con Google o GitHub.
- * El servidor lo redirige a  /oauth-callback#token=...  (o  #error=codigo  si algo falló).
+ * Pantalla a la que vuelve el navegador después de entrar con Google.
+ * El servidor ya dejó la sesión en una cookie; si algo falló, la dirección trae  #error=codigo.
  */
 @Component({
   selector: 'app-oauth-callback',
@@ -20,27 +20,23 @@ export class OauthCallbackComponent implements OnInit {
   private toast  = inject(ToastService);
 
   private mensajes: Record<string, string> = {
-    cuenta_no_vinculada: 'Tu cuenta no está vinculada a ningún usuario del sistema. Pide al coordinador que registre tu correo.',
-    email_no_verificado: 'El correo de tu cuenta no está verificado en ese proveedor.',
+    cuenta_no_vinculada: 'Tu correo de Google no aparece registrado como acudiente. Por favor verifica que uses el correo registrado en el colegio o contacta a la institución.',
+    email_no_verificado: 'El correo de tu cuenta no está verificado en Google.',
     oauth_fallido: 'No se pudo completar el inicio de sesión.'
   };
 
   ngOnInit() {
-    // El token viene en el fragmento (#), que el navegador nunca envía a ningún servidor
     const params = new URLSearchParams(window.location.hash.substring(1));
-    const token = params.get('token');
     const error = params.get('error');
-    // Se quita de la barra de direcciones y del historial para que no quede a la vista
     window.history.replaceState(null, '', window.location.pathname);
 
-    if (!token) {
-      this.toast.show(this.mensajes[error ?? ''] ?? 'No se pudo iniciar sesión', 'err');
+    if (error) {
+      this.toast.show(this.mensajes[error] ?? 'No se pudo iniciar sesión', 'err');
       this.router.navigate(['/login']);
       return;
     }
 
-    // Se guarda el token y se piden los datos del usuario (rol, nombre y sus reportes si aplica)
-    localStorage.setItem('token', token);
+    // La cookie ya está en el navegador: se piden los datos de la persona (rol, nombre y reportes)
     this.api.get<any>('/api/auth/me').subscribe({
       next: res => {
         localStorage.setItem('rol', res.rol);

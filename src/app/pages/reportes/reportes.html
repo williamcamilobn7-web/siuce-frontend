@@ -51,7 +51,7 @@
 </div>
 
 <div class="modal-backdrop" [class.open]="modalOpen">
-  <div class="modal">
+  <div class="modal" [style.max-width]="!editando ? '680px' : '560px'">
     <div class="modal-header">
       <span class="modal-title">{{editando ? 'Editar reporte #'+editando.id : 'Nuevo reporte'}}</span>
       <button class="btn-close" (click)="modalOpen=false">✕</button>
@@ -63,13 +63,96 @@
       </div>
       <div class="form-group">
         <label class="form-label">Descripción del hecho *</label>
-        <textarea class="form-control" [(ngModel)]="form.descripcionHecho" rows="5" (input)="calcTipo()" placeholder="Describe lo ocurrido…"></textarea>
+        <textarea class="form-control" [(ngModel)]="form.descripcionHecho" rows="4" (input)="calcTipo()" placeholder="Describe lo ocurrido…"></textarea>
         @if (tipoPreview) {
           <span class="badge mt-16" [class]="tipoPreview==='TIPO_I'?'badge-t1':tipoPreview==='TIPO_II'?'badge-t2':'badge-t3'">
             {{tipoLabel(tipoPreview)}} (estimado)
           </span>
         }
       </div>
+
+      <!-- Sección de Implicados: solo visible al crear nuevo reporte -->
+      @if (!editando) {
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.08)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <span style="font-weight:600;font-size:13px;color:var(--text-main)">
+              Implicados en el incidente (Opcional)
+            </span>
+            <span style="font-size:11px;color:var(--text-muted)">
+              Podrás agregar más después en el detalle
+            </span>
+          </div>
+
+          <!-- Cuadro para buscar y seleccionar estudiante -->
+          <div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-radius:8px;padding:12px;margin-bottom:12px">
+            <div class="form-group" style="margin-bottom:8px">
+              <label class="form-label" style="font-size:12px">Buscar estudiante (mín. 2 letras)</label>
+              <input class="form-control" [(ngModel)]="busquedaEstudiante" (input)="buscarEstudiantes()" placeholder="Nombre o documento..."/>
+            </div>
+
+            @if (estudiantesFiltrados.length > 0) {
+              <div class="form-group" style="margin-bottom:8px">
+                <label class="form-label" style="font-size:12px">Selecciona estudiante *</label>
+                <select class="form-control" [(ngModel)]="nuevoImplicado.estudianteId">
+                  <option value="">— Seleccionar —</option>
+                  @for (e of estudiantesFiltrados; track e.id) {
+                    <option [value]="e.id">{{nombreEstudiante(e)}} — Grado: {{e.grado || 'S/G'}}</option>
+                  }
+                </select>
+              </div>
+            } @else if (buscando) {
+              <div style="font-size:11px;color:var(--text-dim);margin-bottom:8px">Buscando...</div>
+            }
+
+            <div style="display:flex;gap:10px;align-items:flex-end">
+              <div class="form-group" style="flex:1;margin-bottom:0">
+                <label class="form-label" style="font-size:12px">Rol en el hecho *</label>
+                <select class="form-control" [(ngModel)]="nuevoImplicado.rol">
+                  <option value="VICTIMA">Víctima</option>
+                  <option value="AGRESOR">Agresor</option>
+                  <option value="TESTIGO">Testigo</option>
+                </select>
+              </div>
+              <button type="button" class="btn btn-primary" (click)="agregarImplicadoTemporal()" [disabled]="!nuevoImplicado.estudianteId">
+                ＋ Añadir
+              </button>
+            </div>
+          </div>
+
+          <!-- Lista de implicados que se van agregando -->
+          @if (implicadosParaCrear.length > 0) {
+            <div style="font-size:12px;font-weight:500;margin-bottom:6px;color:var(--text-muted)">
+              Implicados a registrar ({{implicadosParaCrear.length}}):
+            </div>
+            <table style="width:100%;margin-bottom:10px;font-size:12px">
+              <thead>
+                <tr>
+                  <th style="text-align:left;padding:6px 8px">Estudiante</th>
+                  <th style="text-align:left;padding:6px 8px">Grado</th>
+                  <th style="text-align:left;padding:6px 8px">Rol</th>
+                  <th style="text-align:right;padding:6px 8px"></th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (imp of implicadosParaCrear; track imp.estudiante.id; let idx = $index) {
+                  <tr>
+                    <td style="padding:6px 8px">{{imp.estudiante.nombres}} {{imp.estudiante.apellidos}}</td>
+                    <td style="padding:6px 8px">{{imp.estudiante.grado || '—'}}</td>
+                    <td style="padding:6px 8px">
+                      <span class="badge" [class]="imp.rol==='VICTIMA'?'badge-victima':imp.rol==='AGRESOR'?'badge-agresor':'badge-testigo'">
+                        {{imp.rol}}
+                      </span>
+                    </td>
+                    <td style="text-align:right;padding:6px 8px">
+                      <button type="button" class="btn btn-danger btn-sm" style="padding:2px 8px" (click)="quitarImplicadoTemporal(idx)">✕</button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+      }
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" (click)="modalOpen=false">Cancelar</button>
