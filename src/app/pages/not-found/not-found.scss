@@ -1,0 +1,117 @@
+.error-container {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.error-card {
+  background: var(--navy-mid, #162844);
+  border: 1px solid var(--navy-border, #243d5e);
+  border-radius: 14px;
+  padding: 40px 32px;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.icon {
+  font-size: 52px;
+  margin-bottom: 12px;
+}
+
+.badge-code {
+  display: inline-block;
+  background: rgba(96, 165, 250, 0.12);
+  color: #60a5fa;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #f0ece4;
+}
+
+p {
+  color: #8fa4be;
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.info-box {
+  background: rgba(15, 31, 53, 0.7);
+  border: 1px solid var(--navy-border, #243d5e);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 24px;
+  font-size: 13px;
+  color: #8fa4be;
+  text-align: left;
+
+  span {
+    color: #f0ece4;
+    font-weight: 500;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-primary {
+  background: #2f80ed;
+  color: #fff;
+  border: 1px solid #2f80ed;
+
+  &:hover {
+    background: #1a6ed4;
+  }
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #8fa4be;
+  border: 1px solid var(--navy-border, #243d5e);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+  }
+}
+
+.brand {
+  margin-top: 24px;
+  font-size: 12px;
+  color: #5a7494;
+}

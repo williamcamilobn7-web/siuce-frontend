@@ -21,4 +21,5 @@ export const routes: Routes = [
   { path: 'mapa', canActivate: [authGuard], loadComponent: () => import('./pages/mapa/mapa').then(m => m.MapaComponent) },
   { path: 'oauth-callback', loadComponent: () => import('./pages/oauth-callback/oauth-callback').then(m => m.OauthCallbackComponent) },
   { path: 'acudientes',  canActivate: [authGuard], loadComponent: () => import('./pages/acudientes/acudientes').then(m => m.AcudientesComponent) },
+  { path: '**', loadComponent: () => import('./pages/not-found/not-found').then(m => m.NotFoundComponent) },
 ];

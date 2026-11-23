@@ -1,0 +1,23 @@
+<div class="error-container">
+  <div class="error-card">
+    <div class="icon">🔍</div>
+    <div class="badge-code">ERROR 404 · RUTA NO ENCONTRADA</div>
+    <h1>Página No Encontrada</h1>
+    <p>La dirección que estás buscando no existe en el sistema SIUCE o ha sido reubicada.</p>
+
+    <div class="info-box">
+      <span>Ruta solicitada:</span> Comprueba que la URL en la barra de navegación esté bien escrita o regresa a tu panel principal.
+    </div>
+
+    <div class="actions">
+      @if (rol) {
+        <a routerLink="/dashboard" class="btn btn-primary">Volver al Dashboard</a>
+      } @else {
+        <a routerLink="/login" class="btn btn-primary">Ir al Login</a>
+      }
+      <a href="javascript:history.back()" class="btn btn-secondary">Regresar</a>
+    </div>
+
+    <div class="brand">⚖ SIUCE Bridge · Sistema de Gestión Disciplinaria</div>
+  </div>
+</div>
